@@ -1,0 +1,26 @@
+---
+pipeline:
+  test:
+    image: python:3.7-alpine3.7
+    commands:
+      - pip install -r requirements/dev.txt
+      - python manage.py test
+    when:
+      event: [push, tag]
+    environment:
+      - DJANGO_SETTINGS_MODULE=petshop.settings
+
+  docker-image:
+    image: plugins/docker
+    secrets: [DOCKER_USERNAME, DOCKER_PASSWORD]
+    settings:
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+      repo: geraldoandradee/django-petshop
+    auto_tag: true
+    when:
+      event: [push, tag]
+      branch: [master]
+      status: [success]

@@ -1,0 +1,37 @@
+version: "2.1"
+
+services:
+  petshop:
+    hostname: "petshop.localhost"
+    env_file:
+      .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: petshop
+    volumes:
+      - ./petshop:/app
+    ports:
+      - "8080:8080"
+    networks:
+      - petshop-network
+
+  nginx:
+    image: nginx:1.15.8-alpine
+    hostname: "nginx.localhost"
+    ports:
+      - "8000:8000"
+    networks:
+      - petshop-network
+    volumes:
+      - ./docker:/etc/nginx/conf.d
+      - ./petshop/static:/etc/nginx/html/static
+    depends_on:
+      - petshop
+
+volumes:
+  static-content:
+
+networks:
+  petshop-network:
+    driver: bridge
